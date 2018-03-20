@@ -1,8 +1,10 @@
-from open_kmbs import get_articles
+import open_kmbs
+import mind_ua
 import bot
 
 def main():
-    kmbs_articles = get_articles()
+    kmbs_articles = open_kmbs.get_articles()
+    mind_ua_articles = mind_ua.get_articles()
     bot.set_articles(kmbs_articles)
 
 
