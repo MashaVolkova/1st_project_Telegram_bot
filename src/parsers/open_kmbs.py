@@ -27,12 +27,12 @@ def get_articles():
 
     for li in lis:
         url, title, description = process_li(li)
-    if url not in article_dict:
-        article_dict[url] = {
-            'title': title,
-            'url': url,
-            'description': description,
-            'time': time.time()
-            # тайм штамп - значение в секундах, описывает момент времени когда статья была обработана и добавлена в словарь
-        }
+        if url not in article_dict:
+            article_dict[url] = {
+                'title': title,
+                'url': url,
+                'description': description,
+                'time': round(time.time())
+                # тайм штамп - значение в секундах, описывает момент времени когда статья была обработана и добавлена в словарь
+            }
     return article_dict

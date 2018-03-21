@@ -1,11 +1,15 @@
 import open_kmbs
-import mind_ua
+#import mind_ua
 import bot
+import data_base
+
 
 def main():
-    kmbs_articles = open_kmbs.get_articles()
-    mind_ua_articles = mind_ua.get_articles()
-    bot.set_articles(kmbs_articles)
+    if not data_base.is_article_present():
+        data_base.add_articles_list(open_kmbs.get_articles().values())
+
+    articles_from_db = data_base.get_articles()
+    bot.set_articles(articles_from_db)
 
 
 if __name__ == '__main__':

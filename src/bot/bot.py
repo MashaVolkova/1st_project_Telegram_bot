@@ -13,15 +13,11 @@ def set_articles(art):
 
 @bot.message_handler(commands=['start'])
 def send_articles(message):
+    global articles
     if articles is not None:
-        limit = 1
-        i = 0
-        for url in articles:
-            if i >= limit:
-                break
-            text = '{}\n{}\n{}'.format(articles[url]['title'], articles[url]['description'], url)
+        for article in articles:
+            text = '{}\n{}\n{}'.format(article.title, article.description, article.id_url)
             bot.send_message(message.chat.id, text)
-            i += 1
 
 
 def run_bot(): #функция которая запускается в отдельном потоке
