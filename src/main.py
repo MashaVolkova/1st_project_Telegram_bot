@@ -2,14 +2,25 @@ import open_kmbs
 #import mind_ua
 import bot
 import data_base
+from threading import Timer
+
+timer = None
 
 
 def main():
-    if not data_base.is_article_present():
-        data_base.add_articles_list(open_kmbs.get_articles().values())
+    global timer
+    timer = Timer(1, check_articles)
+    timer.start()
+    data_base.init()
 
-    articles_from_db = data_base.get_articles()
-    bot.set_articles(articles_from_db)
+
+def check_articles():
+    global timer
+    # if timer.interval == 0:
+    #     timer.interval = 10
+    data_base.add_articles_list(open_kmbs.get_articles().values())
+    bot.clear_cache()
+    bot.send_articles()
 
 
 if __name__ == '__main__':
