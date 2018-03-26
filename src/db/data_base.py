@@ -2,14 +2,15 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 #from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import update
 from time import time
 
 
 Base = declarative_base()
 engine = None
 session = None
-
 
 class Articles(Base):
     __tablename__ = 'articles'
@@ -27,18 +28,15 @@ class User(Base):
     max_count = Column(Integer)
 
 
-def init():
+def init(): #инициализация базы данных из мейна
     global engine, session
-    engine = create_engine('sqlite:///articles.db')
+    engine = create_engine('sqlite:///articles.db', connect_args={'check_same_thread': False}, poolclass=StaticPool) #отключает проверку на обращение к бд с другого потока, где она инициализирована
     Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine) #создаю класс
-    session = Session() #создаю экземпляр класса
+    Session = sessionmaker(bind=engine) #создание класса
+    session = Session() #создание экземпляра класса
 
 
-
-
-
-def add_article(id_url, title, description, timestamp): #добавляю одну запись в базу данных
+def add_article(id_url, title, description, timestamp): #добавление одной записи в базу данных
     article = Articles()
     article.id_url, article.title, article.description, article.timestamp = id_url, title, description, timestamp
     session.add(article)
@@ -61,14 +59,14 @@ def get_articles(time_offset=86400):
     return arts
 
 
-def get_articles_for_timestamp(timestamp):
-    arts = session.query(Articles).filter(Articles.timestamp >= timestamp).all()
+def get_articles_by_timestamp(timestamp):
+    arts = session.query(Articles).filter(Articles.timestamp > timestamp).all()
     return arts
 
 
-def is_article_present(art_id):
+def is_article_present(art_id): #функция которая проверяет есть ли статья в бд
     if art_id is not None:
-        return session.query(Articles).filter(Articles.id_url == art_id) is not None
+        return session.query(Articles).filter(Articles.id_url == art_id).first() is not None
     else:
         return len(session.query(Articles).all()) > 0
 
@@ -78,14 +76,32 @@ def add_user(user_id, update_period=1, max_count=1):
     user.id = user_id
     user.update_period = update_period
     user.max_count = max_count
-    user.timestamp = 0
+    user.last_update = 0
     session.add(user)
     session.commit()
 
 
 def is_user_present(user_id):
-    user = session.query(User).filter(User.id == user_id).all()
+    user = get_user(user_id)
     return user is not None
+
+
+def get_user(user_id):
+    user = session.query(User).filter(User.id == user_id).first()
+    return user
+
 
 def get_users():
     return session.query(User).all()
+
+
+def update_user_last_update(user_id, timestamp):
+    user = get_user(user_id)
+    user.last_update = timestamp
+    session.commit()
+
+
+def update_user_max_count(user_id, max_count):
+    user = get_user(user_id)
+    user.max_count = max_count
+    session.commit()
