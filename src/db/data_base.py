@@ -31,7 +31,7 @@ class User(Base):
 
 def init(): #инициализация базы данных из main
     global engine, session
-    engine = create_engine('sqlite:///articles.db', connect_args={'check_same_thread': False}, poolclass=StaticPool)
+    engine = create_engine('sqlite:///articles.db', connect_args={'check_same_thread': False}, poolclass=StaticPool) #отключает проверку на обращение к бд с другого потока, где она инициализирована
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine) #создание класса
     session = Session() #создание экземпляра класса
