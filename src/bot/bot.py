@@ -4,12 +4,11 @@ import data_base
 from threading import Thread
 
 
-bot = telebot.TeleBot(config.token) #создание объекта своего бота
+bot = telebot.TeleBot(config.token) #создала объект своего бота
 articles_cache = {}
 db_session = None
 
 def clear_cache():
-    global articles_cache
     articles_cache = {}
 
 
@@ -19,7 +18,7 @@ def process_start(message):
     if not data_base.is_user_present(user_id):
         data_base.add_user(user_id)
 
-    bot.send_message(user_id, "Use '/set_max {number}' command for set numbers of articles to send")
+    bot.send_message(user_id, "Use '/set_max {number}' command for set...")
 
     # global articles
     # if articles is not None:

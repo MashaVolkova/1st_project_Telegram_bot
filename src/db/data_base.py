@@ -12,6 +12,7 @@ Base = declarative_base()
 engine = None
 session = None
 
+
 class Articles(Base):
     __tablename__ = 'articles'
     id_url = Column(String(1000), primary_key=True)
@@ -28,9 +29,9 @@ class User(Base):
     max_count = Column(Integer)
 
 
-def init(): #инициализация базы данных из мейна
+def init(): #инициализация базы данных из main
     global engine, session
-    engine = create_engine('sqlite:///articles.db', connect_args={'check_same_thread': False}, poolclass=StaticPool) #отключает проверку на обращение к бд с другого потока, где она инициализирована
+    engine = create_engine('sqlite:///articles.db', connect_args={'check_same_thread': False}, poolclass=StaticPool)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine) #создание класса
     session = Session() #создание экземпляра класса
@@ -104,4 +105,8 @@ def update_user_last_update(user_id, timestamp):
 def update_user_max_count(user_id, max_count):
     user = get_user(user_id)
     user.max_count = max_count
+
+    # DEBUG: обнуление last_update в тот момент, когда мы записываем новое значение max_count
+    user.last_update = 0
+
     session.commit()
